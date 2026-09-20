@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrains.Swerve;
 
 //the name is how this Opmode will show up on the driver-hub
@@ -22,7 +23,8 @@ public class SwerveMode extends LinearOpMode
         if (isStopRequested()) return;
         while (opModeIsActive())
         {
-            swerve.drive(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+            swerve.drive(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x, telemetry);
+            telemetry.update();
         }
     }
 }
