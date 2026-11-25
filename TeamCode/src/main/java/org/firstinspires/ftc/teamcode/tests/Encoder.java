@@ -1,0 +1,106 @@
+package org.firstinspires.ftc.teamcode.tests;
+
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
+public class Encoder {
+
+    HardwareMap hardwareMap;
+    Telemetry telemetry;
+
+    DcMotor IgorLeft;
+    DcMotor IgorRight;
+    DcMotor DeanLeft;
+    DcMotor DeanRight;
+
+    double ticks = 384.5;
+
+    public void init(HardwareMap hardwareMap, Telemetry telemetry){
+
+
+        this.hardwareMap = hardwareMap;
+        this.telemetry = telemetry;
+
+        IgorLeft = hardwareMap.get(DcMotor.class, "IgorLeft");
+        IgorRight = hardwareMap.get(DcMotor.class, "IgorRight");
+        DeanLeft = hardwareMap.get(DcMotor.class, "DeanLeft");
+        DeanRight = hardwareMap.get(DcMotor.class, "DeanRight");
+
+        IgorLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        IgorRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        DeanLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        DeanRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        telemetry.addData("Hardware: ", "Initialized");
+
+
+    }
+
+
+
+    private double lastTarget = 0;
+    public void encoder(double JoyStickX, double JoyStickY) {
+
+        if (Math.hypot(JoyStickX, JoyStickY) > 0.1) {
+            double angle = Math.atan2(JoyStickY, JoyStickX);
+            if (angle < 0) {
+                angle += 2 * Math.PI;
+            }
+
+            double newTarget = (angle / (2 * Math.PI)) * ticks;
+
+            double delta = newTarget - lastTarget;
+            if (delta > ticks / 2) delta -= ticks;
+            if (delta < -ticks / 2) delta += ticks;
+
+            lastTarget += delta;
+        }
+//        else {
+//            IgorLeft.setPower(0);
+//            IgorRight.setPower(0);
+//            DeanLeft.setPower(0);
+//            DeanRight.setPower(0);
+//        }
+
+        double rateSteer = 0.005;
+        double rateDrive = 1;
+
+        double current = IgorLeft.getCurrentPosition();
+        double error = lastTarget - current;
+        double anglerror = (error / ticks) * 2 * Math.PI;
+
+        if (error > ticks / 2) error -= ticks;
+        if (error < -ticks / 2) error += ticks;
+
+        double power = error * rateSteer;
+        if (Math.abs(error) < 5) power = 0;
+        power = Math.max(-1, Math.min(1, power));
+
+        //double JoyStickStrength = Math.hypot(JoyStickX, JoyStickY);
+        //double powerD = rateDrive * Math.cos(anglerror) * JoyStickStrength;
+        //if (Math.abs(error) > ticks / 2) powerD = 0;
+
+        //double power = powerS + powerD;
+        //power = Math.max(-1, Math.min(1, power));
+
+        IgorLeft.setPower(power);
+        IgorRight.setPower(power);
+        DeanLeft.setPower(power);
+        DeanRight.setPower(power);
+
+
+
+
+
+
+    }
+
+    public void updateTelemetry() {
+        telemetry.addData("IgorLeft Pos:", IgorLeft.getCurrentPosition());
+        telemetry.addData("IgorRight Pos:", IgorRight.getCurrentPosition());
+        telemetry.addData("DeanLeft Pos:", DeanLeft.getCurrentPosition());
+        telemetry.addData("DeanRight Pos:", DeanRight.getCurrentPosition());
+    }
+}
