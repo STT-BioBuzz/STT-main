@@ -30,15 +30,15 @@ public class MecanumDrivetrain {
 
     public void drive(double y, double x, double r, double power){
 
-        double flp = (y + x + r) * power;
-        double frp = (y + x + r) * power;
-        double blp = (y + x + r) * power;
-        double brp = (y + x + r) * power;
+        double flp = (y - x - r) * power;
+        double frp = (-y - x - r) * power;
+        double blp = (-y - x + r) * power;
+        double brp = (-y + x - r) * power;
 
         fl.setPower(flp);
-        fr.setPower(flp);
-        bl.setPower(flp);
-        br.setPower(flp);
+        fr.setPower(frp);
+        bl.setPower(blp);
+        br.setPower(brp);
 
 
     }
